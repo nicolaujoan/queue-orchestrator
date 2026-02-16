@@ -36,7 +36,7 @@ For Laravel 11 and 12, add the package provider to your `bootstrap/providers.php
 return [
     App\Providers\AppServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
-    Org\QueueOrchestrator\QueueOrchestratorServiceProvider::class, // Add this line
+    Nexia\QueueOrchestrator\QueueOrchestratorServiceProvider::class, // Add this line
 ];
 
 ```
