@@ -11,7 +11,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Org\\QueueOrchestrator\\QueueOrchestratorServiceProvider"
+                "Nexia\\QueueOrchestrator\\QueueOrchestratorServiceProvider"
             ]
         }
     },
