@@ -17,20 +17,14 @@ Standardize complex queue chains, worker scaling, and dynamic scheduling across 
 
 ### 1. Composer Setup
 
-Add the repository to your project's `composer.json`:
+Add the package via composer (once published to Packagist):
 
-```json
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "https://github.com/nicolaujoan/queue-orchestrator.git"
-    }
-],
-"require": {
-    "nicolaujoan/queue-orchestrator": "^1.0"
-}
+```bash
+composer require nexia/queue-orchestrator
 
 ```
+
+*Note: If using a private repository before publishing, add the VCS link to your `composer.json` first.*
 
 ### 2. Register Service Provider
 
@@ -57,12 +51,12 @@ Populate the `QueueRegistry` within your `AppServiceProvider.php` to map keys to
 
 ```php
 use Org\QueueOrchestrator\Services\QueueRegistry;
-use App\Jobs\ProcessOrders;
+use App\Jobs\ProcessData;
 
 public function boot(QueueRegistry $registry)
 {
     // Simple registration
-    $registry->register('orders', fn() => new ProcessOrders());
+    $registry->register('data-sync', fn() => new ProcessData());
 
     // Registration with arguments (supports 'queue-name::arg-value')
     $registry->register('reports', function(?string $arg) {
@@ -81,17 +75,17 @@ namespace App\Console\Commands;
 
 use Org\QueueOrchestrator\Commands\AbstractQueueCommand;
 
-class ExecuteOrders extends AbstractQueueCommand
+class ExecuteDataSync extends AbstractQueueCommand
 {
-    protected $signature = 'execute:orders {--workers=5}';
+    protected $signature = 'execute:data-sync {--workers=5}';
 
-    protected function getQueueName(): string { return 'orders'; }
+    protected function getQueueName(): string { return 'data-sync'; }
     protected function getDefaultWorkers(): int { return 5; }
 
     protected function getNextJobs(): array
     {
-        // Automatically dispatch cleanup after orders are processed
-        return [new \App\Jobs\CleanupProcessedOrders()];
+        // Automatically dispatch cleanup or downstream jobs after the queue is empty
+        return [new \App\Jobs\NotifySyncCompletion()];
     }
 }
 
@@ -104,9 +98,9 @@ Decouple your schedule logic from the code by using config-driven strings.
 ```php
 use Org\QueueOrchestrator\Services\ScheduleParser;
 
-$event = Schedule::job(new \App\Jobs\ProcessOrders());
+$event = Schedule::job(new \App\Jobs\ProcessData());
 
-ScheduleParser::apply($event, config('tasks.order_sync'))
+ScheduleParser::apply($event, config('tasks.sync_schedule'))
     ->withoutOverlapping();
 
 ```
@@ -121,7 +115,7 @@ Trigger any registered job via CLI. Arguments are passed after `::`.
 
 ```bash
 # Basic usage
-php artisan orchestrator:launch orders
+php artisan orchestrator:launch data-sync
 
 # With parameters
 php artisan orchestrator:launch reports::financial
@@ -130,10 +124,10 @@ php artisan orchestrator:launch reports::financial
 
 ### Running the Orchestrator
 
-Execute your custom command to start the worker management process.
+Execute your custom command to start the worker management process. This is what you usually put in your system scheduler.
 
 ```bash
-php artisan execute:orders --workers=10
+php artisan execute:data-sync --workers=10
 
 ```
 
@@ -143,35 +137,35 @@ php artisan execute:orders --workers=10
 
 The `::args` suffix allows a single job class to adapt based on CLI input.
 
-### 💡 Option A: Simple Toggle (Ternary)
+### 💡 Use Case 1: Simple Toggle (Ternary)
 
 *Best for booleans or single default values.*
 
 ```php
-$registry->register('marketing-sync', function(?string $args) {
-    // Command: php artisan orchestrator:launch marketing-sync::force
-    $forceUpdate = ($args === 'force');
+$registry->register('email-blast', function(?string $args) {
+    // Command: php artisan orchestrator:launch email-blast::test-mode
+    $isTest = ($args === 'test-mode');
     
-    return new MarketingSyncJob(force: $forceUpdate);
+    return new SendEmailBlast(isTest: $isTest);
 });
 
 ```
 
-### 🏆 Option B: Complex Mapping (Match)
+### 🏆 Use Case 2: Complex Mapping (Match)
 
 *Best for multiple aliases and type checking.*
 
 ```php
-$registry->register('data-export', function(?string $args) {
-    // Command: php artisan orchestrator:launch data-export::csv
+$registry->register('export-logs', function(?string $args) {
+    // Command: php artisan orchestrator:launch export-logs::csv
     $format = match(true) {
         $args === 'csv'   => 'text/csv',
         $args === 'pdf'   => 'application/pdf',
-        is_null($args)    => 'application/json',
-        default           => throw new \Exception("Unsupported format"), 
+        is_numeric($args) => 'id_specific_export',
+        default           => 'application/json', 
     };
     
-    return new DataExportJob(mimeType: $format);
+    return new ExportLogsJob(mode: $format);
 });
 
 ```
@@ -186,10 +180,16 @@ $registry->register('data-export', function(?string $args) {
 | --- | --- | --- |
 | **Cron** | `* * * * *` | Standard cron expression |
 | **Predefined** | `hourly` | Laravel's built-in hourly |
-| **Custom** | `monthly:1,02:00` | Specific day and time |
+| **Custom** | `monthly:1,02:00` | Specific day (1st) and time (2 AM) |
 
 > [!TIP]
 > **Workflow for new processes:**
 > 1. Create **Job** → 2. Register in **Registry** → 3. Create **Command** → 4. Set **Schedule**.
 > 
 > 
+
+---
+
+## ⚖️ License
+
+This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
