@@ -3,8 +3,8 @@
 namespace Nexia\QueueOrchestrator;
 
 use Illuminate\Support\ServiceProvider;
-use Org\QueueOrchestrator\Commands\LaunchQueueCommand;
-use Org\QueueOrchestrator\Services\QueueRegistry;
+use Nexia\QueueOrchestrator\Commands\LaunchQueueCommand;
+use Nexia\QueueOrchestrator\Services\QueueRegistry;
 
 class QueueOrchestratorServiceProvider extends ServiceProvider
 {

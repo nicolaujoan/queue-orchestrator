@@ -50,7 +50,7 @@ return [
 Populate the `QueueRegistry` within your `AppServiceProvider.php` to map keys to Job instances.
 
 ```php
-use Org\QueueOrchestrator\Services\QueueRegistry;
+use Nexia\QueueOrchestrator\Services\QueueRegistry;
 use App\Jobs\ProcessData;
 
 public function boot(QueueRegistry $registry)
@@ -73,7 +73,7 @@ Extend `AbstractQueueCommand` to create a manager for your workers.
 ```php
 namespace App\Console\Commands;
 
-use Org\QueueOrchestrator\Commands\AbstractQueueCommand;
+use Nexia\QueueOrchestrator\Commands\AbstractQueueCommand;
 
 class ExecuteDataSync extends AbstractQueueCommand
 {
@@ -96,7 +96,7 @@ class ExecuteDataSync extends AbstractQueueCommand
 Decouple your schedule logic from the code by using config-driven strings.
 
 ```php
-use Org\QueueOrchestrator\Services\ScheduleParser;
+use Nexia\QueueOrchestrator\Services\ScheduleParser;
 
 $event = Schedule::job(new \App\Jobs\ProcessData());
 

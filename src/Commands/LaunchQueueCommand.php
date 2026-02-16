@@ -3,7 +3,7 @@
 namespace Nexia\QueueOrchestrator\Commands;
 
 use Illuminate\Console\Command;
-use Org\QueueOrchestrator\Services\QueueRegistry;
+use Nexia\QueueOrchestrator\Services\QueueRegistry;
 
 class LaunchQueueCommand extends Command
 {
