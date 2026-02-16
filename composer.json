@@ -1,0 +1,24 @@
+{
+    "name": "nexia/queue-orchestrator",
+    "description": "Orchestrates complex queue chains and parallel workers",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nexia\\QueueOrchestrator\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Org\\QueueOrchestrator\\QueueOrchestratorServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/console": "^9.0|^10.0|^11.0|^12.0",
+        "illuminate/queue": "^9.0|^10.0|^11.0|^12.0"
+    }
+}

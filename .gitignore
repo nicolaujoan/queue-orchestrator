@@ -1,0 +1,20 @@
+# Local dependencies
+/vendor
+composer.lock
+
+# Testing & Environment
+.env
+.env.backup
+.phpunit.result.cache
+/tests/_output
+/tests/_support/_generated
+
+# IDE & OS Files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build Artifacts
+/dist
+/build
