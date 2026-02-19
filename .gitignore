@@ -18,3 +18,5 @@ Thumbs.db
 # Build Artifacts
 /dist
 /build
+
+package_maintenance.md
