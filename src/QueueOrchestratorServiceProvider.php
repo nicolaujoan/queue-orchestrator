@@ -5,6 +5,7 @@ namespace Nexia\QueueOrchestrator;
 use Illuminate\Support\ServiceProvider;
 use Nexia\QueueOrchestrator\Commands\LaunchQueueCommand;
 use Nexia\QueueOrchestrator\Services\QueueRegistry;
+use Nexia\QueueOrchestrator\Commands\ScheduleRunSilent;
 
 class QueueOrchestratorServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,7 @@ class QueueOrchestratorServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 LaunchQueueCommand::class,
+                ScheduleRunSilent::class,
             ]);
         }
     }
